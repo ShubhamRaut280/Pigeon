@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "916654692678",
+    "project_id": "pigeon-98944",
+    "storage_bucket": "pigeon-98944.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916654692678:android:d4801504210589e7f82d47",
+        "android_client_info": {
+          "package_name": "com.pigeonchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "916654692678-fmlpf2kc54kir07kcbinlfuegqc1hvdi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pigeonchat",
+            "certificate_hash": "5f3e45da244be1d0b43a3ef261b935670988db48"
+          }
+        },
+        {
+          "client_id": "916654692678-q7lvk1lqa2dgudl3gn41150cd59fji1o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrWFHROUk6X65-5NbH-Ige6poRmKtGKxo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "916654692678-q7lvk1lqa2dgudl3gn41150cd59fji1o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
