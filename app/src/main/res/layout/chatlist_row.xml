@@ -29,7 +29,7 @@
             android:textStyle="bold"
             android:textSize="26dp"
             android:layout_gravity="center"
-            android:text="Yash Surendra Jadhav"/>
+            android:text="Saurav Yadhav"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
