@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Pigeon</string>
+    <string name="default_web_client_id">916654692678-q7lvk1lqa2dgudl3gn41150cd59fji1o.apps.googleusercontent.com</string>
+    <string name="voice_call"> Start Voice Call</string>
+    <string name="video_call"> Start Video Call</string>
+    <string name="more_options"> More options</string>
 </resources>
