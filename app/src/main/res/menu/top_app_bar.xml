@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/voiceCall"
+        android:icon="@drawable/ic_voicecall_button"
+        android:title="@string/voice_call"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/videoCall"
+        android:icon="@drawable/ic_videocall_button"
+        android:title="@string/video_call"
+        app:showAsAction="ifRoom" />
+
+</menu>
