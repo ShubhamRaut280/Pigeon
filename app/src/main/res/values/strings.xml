@@ -4,4 +4,6 @@
     <string name="voice_call"> Start Voice Call</string>
     <string name="video_call"> Start Video Call</string>
     <string name="more_options"> More options</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
