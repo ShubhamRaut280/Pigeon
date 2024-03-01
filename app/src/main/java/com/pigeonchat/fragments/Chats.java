@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.pigeonchat.adapters.ChatRecyclerViewAdapter;
-import com.pigeonchat.DataModel;
+import com.pigeonchat.Models.DataModel;
 import com.pigeonchat.R;
 import com.pigeonchat.databinding.FragmentChatsBinding;
 

@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.pigeonchat.DataModel;
+import com.pigeonchat.Models.DataModel;
 import com.pigeonchat.databinding.ChatlistBinding;
 import java.util.List;
 

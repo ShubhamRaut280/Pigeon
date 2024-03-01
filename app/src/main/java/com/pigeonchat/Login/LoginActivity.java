@@ -24,6 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.pigeonchat.MainActivity;
 import com.pigeonchat.R;
@@ -99,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (user != null) {
                                 Log.d(TAG, "onComplete: username is : "+ user.getDisplayName()+ " email for user is : "+ user.getEmail()
                                         +" user : "+ user.getPhoneNumber());
+                                addUser(user);
                                 Toast.makeText(LoginActivity.this, "sign in successful", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(LoginActivity.this, ChatScreen.class));
                                 finish();
@@ -108,6 +110,25 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    protected void addUser(FirebaseUser user){
+
+        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("pigeon-98944-default-rtdb");
+
+        db.child("users")
+                .child(user.getUid())
+                .child("username").setValue(user.getDisplayName());
+
+        db.child("users")
+                .child(user.getUid())
+                .child("emailId").setValue(user.getEmail());
+
+        db.child("users")
+                .child(user.getUid())
+                .child("userId").setValue(user.getUid());
+
+        Log.e("DB", String.valueOf(db.getRef()));
     }
 
     @Override

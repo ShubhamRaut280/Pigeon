@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.pigeonchat.DataModel;
+import com.pigeonchat.Models.DataModel;
 import com.pigeonchat.R;
 import com.pigeonchat.adapters.CallRecyclerViewAdapter;
 import com.pigeonchat.databinding.FragmentCallLogsBinding;

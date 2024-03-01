@@ -1,4 +1,4 @@
-package com.pigeonchat;
+package com.pigeonchat.Models;
 
 public class DataModel {
     private int img;
