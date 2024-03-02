@@ -6,4 +6,12 @@
     <string name="more_options"> More options</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <style name="modalBottomSheet" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/modalBottomSheet</item>
+    </style>
+
+    <style name="TutorialBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/sheet_bg</item>
+    </style>
 </resources>
