@@ -22,7 +22,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.pigeonchat.Models.MessageModel;
 import com.pigeonchat.R;
 
@@ -75,14 +78,6 @@ public class ChatAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         MessageModel messageModel = messageModels.get(position);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context.getApplicationContext(), "sender", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
 
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -91,10 +86,21 @@ public class ChatAdapter extends RecyclerView.Adapter {
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.bottom_sheet);
 
-                Toast.makeText(context.getApplicationContext(), "sender", Toast.LENGTH_SHORT).show();
-
                 LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
                 LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
+
+                layoutDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(context.getApplicationContext(), "click", Toast.LENGTH_SHORT).show();
+                        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("pigeon-98944-default-rtdb");
+                        String senderRoom = FirebaseAuth.getInstance().getUid() + receiverId;
+                        db.child("chats").child(senderRoom)
+                                .child(messageModel.getMessageId())
+                                .setValue(null);
+                        dialog.cancel();
+                    }
+                });
 
                 layoutCopy.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -104,14 +110,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
                             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("label", text);
                             clipboard.setPrimaryClip(clip);
-
                             dialog.cancel();
                         }else{
                             SpannableStringBuilder text =  (SpannableStringBuilder)((ReceiverViewHolder)holder).receiverMsg.getText();
                             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
                             ClipData clip = ClipData.newPlainText("label", text);
                             clipboard.setPrimaryClip(clip);
-
                             dialog.cancel();
                         }
                     }
@@ -148,6 +152,42 @@ public class ChatAdapter extends RecyclerView.Adapter {
         return messageModels.size();
     }
 
+    public void onLongClick(TextView view){
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                final Dialog dialog = new Dialog(v.getContext());
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.bottom_sheet);
+
+                LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
+                LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
+                layoutCopy.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        SpannableStringBuilder text = (SpannableStringBuilder) view.getText();
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("label", text);
+                        clipboard.setPrimaryClip(clip);
+
+                        dialog.cancel();
+
+                    }
+                });
+
+                dialog.show();
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                dialog.getWindow().setGravity(Gravity.BOTTOM);
+
+                return false;
+            }
+        });
+    }
+
     // Receiver
     public class ReceiverViewHolder extends RecyclerView.ViewHolder{
 
@@ -157,6 +197,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
             receiverMsg = itemView.findViewById(R.id.receiverText);
             receiverTime = itemView.findViewById(R.id.receiverTime);
+
+            onLongClick(receiverMsg);
         }
     }
 
@@ -169,6 +211,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
             senderMsg = itemView.findViewById(R.id.senderText);
             senderTime = itemView.findViewById(R.id.senderTime);
+
+            onLongClick(senderMsg);
         }
     }
 }

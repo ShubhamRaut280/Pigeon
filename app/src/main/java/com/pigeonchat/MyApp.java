@@ -3,6 +3,8 @@ package com.pigeonchat;
 import android.app.Application;
 
 import com.google.android.material.color.DynamicColors;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 public class MyApp extends Application {
 
@@ -12,5 +14,7 @@ public class MyApp extends Application {
 
         // Applies Material theme to app
         DynamicColors.applyToActivitiesIfAvailable(this);
+
+        EmojiManager.install(new GoogleEmojiProvider());
     }
 }

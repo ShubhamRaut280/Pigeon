@@ -3,12 +3,14 @@ package com.pigeonchat.UI;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -23,6 +25,8 @@ import com.pigeonchat.Models.MessageModel;
 import com.pigeonchat.R;
 import com.pigeonchat.adapters.ChatAdapter;
 import com.pigeonchat.databinding.ActivityChatScreenBinding;
+import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,16 +36,19 @@ public class ChatScreen extends AppCompatActivity {
 
     DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("pigeon-98944-default-rtdb");
     FirebaseAuth auth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+
         setSupportActionBar(binding.myToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         auth = FirebaseAuth.getInstance();
+
 
         final String senderId = auth.getUid();
         //String receiveId = getIntent().getStringExtra("userId");
@@ -51,14 +58,21 @@ public class ChatScreen extends AppCompatActivity {
         String receiveId = "1sGvehNh4HUud2jKbndHRdOlg3a2";
 
 
-
         final ArrayList<MessageModel> messageModels = new ArrayList<>();
         final ChatAdapter chatAdapter = new ChatAdapter(messageModels, this, receiveId);
-
         binding.chatRecycler.setAdapter(chatAdapter);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.chatRecycler.setLayoutManager(layoutManager);
+
+        EmojiPopup popup = EmojiPopup.Builder.fromRootView(binding.rootView).build(binding.msgContent);
+
+        binding.emojiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popup.toggle();
+            }
+        });
+
 
         final String senderRoom = senderId + receiveId;
         final String receiverRoom = receiveId + senderId;
@@ -89,6 +103,15 @@ public class ChatScreen extends AppCompatActivity {
                 final MessageModel model = new MessageModel(senderId, message);
                 model.setTimestamp(new Date().getTime());
                 binding.msgContent.setText("");
+
+                EmojiTextView emojiTextView = (EmojiTextView) LayoutInflater
+                        .from(v.getContext())
+                                .inflate(R.layout.emoji_text_view,binding.bottom
+                                ,false);
+
+                //emojiTextView.setText(binding.msgContent.toString());
+                binding.bottom.addView(emojiTextView);
+                binding.msgContent.getText().clear();
 
                 db.child("chats")
                         .child(senderRoom)

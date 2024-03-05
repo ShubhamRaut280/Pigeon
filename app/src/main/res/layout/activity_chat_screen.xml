@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/root_view"
     tools:context=".UI.ChatScreen">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -109,11 +110,13 @@
                     android:src="@drawable/ic_emoji_button"
                     android:tint="@color/black" />
 
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/msgContent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
+                    android:inputType="textShortMessage"
                     android:background="@android:color/transparent"
                     android:hint="Message" />
 
