@@ -1,38 +1,58 @@
 package com.pigeonchat.Models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DataModel {
-    private int img;
-    private String msg;
-    private String name;
+    private String about, emailId, image, name, userId;
+    long created_at;
+    boolean is_online;
 
-    public DataModel(int img, String msg, String name) {
-        this.img = img;
-        this.msg = msg;
+//    public ArrayList<List> getContacts() {
+//        return contacts;
+//    }
+
+    public DataModel(String about, String emailId, String image, String name, String userId, long created_at, boolean is_online) {
+        this.about = about;
+        this.emailId = emailId;
+        this.image = image;
         this.name = name;
+        this.userId = userId;
+        this.created_at = created_at;
+        this.is_online = is_online;
+
     }
 
-    public int getImg() {
-        return img;
+    public DataModel() {
     }
 
-    public void setImg(int img) {
-        this.img = img;
+    public String getAbout() {
+        return about;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getEmailId() {
+        return emailId;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public String getImage() {
+        return image;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getUserId() {
+        return userId;
     }
+
+    public long getCreated_at() {
+        return created_at;
+    }
+
+    public boolean is_online() {
+        return is_online;
+    }
+
 }
 

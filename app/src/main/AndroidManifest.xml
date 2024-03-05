@@ -30,6 +30,8 @@
             android:name=".MainActivity"
             android:exported="true">
         </activity>
+
+        <service android:name=".FetchDataService" />
     </application>
 
 </manifest>

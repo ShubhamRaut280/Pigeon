@@ -16,12 +16,12 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivCallProfileImg"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_margin="10dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/broly"
-            app:shapeAppearanceOverlay="@style/SoftCorner" />
+            app:shapeAppearanceOverlay="@style/SoftCorner"
+            app:srcCompat="@mipmap/ic_profile_placeholder_round" />
 
         <LinearLayout
             android:layout_width="260dp"

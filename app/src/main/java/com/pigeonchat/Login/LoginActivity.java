@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -29,6 +31,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.pigeonchat.MainActivity;
 import com.pigeonchat.R;
 import com.pigeonchat.UI.ChatScreen;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -102,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                                         +" user : "+ user.getPhoneNumber());
                                 addUser(user);
                                 Toast.makeText(LoginActivity.this, "sign in successful", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(LoginActivity.this, ChatScreen.class));
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();
                             }
                         } else {
@@ -114,21 +120,34 @@ public class LoginActivity extends AppCompatActivity {
 
     protected void addUser(FirebaseUser user){
 
-        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("pigeon-98944-default-rtdb");
+        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("users");
 
-        db.child("users")
-                .child(user.getUid())
-                .child("username").setValue(user.getDisplayName());
+        Map<String, Object> updates = new HashMap<>();
 
-        db.child("users")
-                .child(user.getUid())
-                .child("emailId").setValue(user.getEmail());
+        updates.put("about", "Hey there, I am using Pigeon chat 👋");
+        updates.put("created_at", new Date().getTime());
+        updates.put("emailId", user.getEmail());
+        updates.put("image", String.valueOf(user.getPhotoUrl()));
+        updates.put("is_online", false);
+        updates.put("name", user.getDisplayName());
+        updates.put("userId", user.getUid());
 
-        db.child("users")
-                .child(user.getUid())
-                .child("userId").setValue(user.getUid());
+        db.child(user.getUid())
+                        .updateChildren(updates)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                //Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(LoginActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
-        Log.e("DB", String.valueOf(db.getRef()));
+        Log.e("DB", String.valueOf(user.getPhotoUrl()));
     }
 
     @Override
@@ -136,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onPostResume();
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
-            startActivity(new Intent(LoginActivity.this, ChatScreen.class));
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
             finish();
         }

@@ -36,9 +36,9 @@ public class CallLogs extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         arr = new ArrayList<>();
-        arr.add(new DataModel(R.drawable.broly, "fqefhqfewsdqf[ew[....1", "Yash"));
-        arr.add(new DataModel(R.drawable.broly, "fqefhqfewsdqf[ew[", "Yash Jadhav"));
-        arr.add(new DataModel(R.drawable.broly, "fqefhqfewsdqf[ew[", "Yash Surendra Jadhav"));
+        //arr.add(new DataModel("R.drawable.broly", "fqefhqfewsdqf[ew[....1"));
+//        arr.add(new DataModel(R.drawable.broly, "fqefhqfewsdqf[ew[", "Yash Jadhav"));
+//        arr.add(new DataModel(R.drawable.broly, "fqefhqfewsdqf[ew[", "Yash Surendra Jadhav"));
         // Add more items as needed...
 
         callAdapter = new CallRecyclerViewAdapter(arr, requireContext());

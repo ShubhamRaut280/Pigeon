@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,8 +23,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.pigeonchat.FetchDataService;
 import com.pigeonchat.Models.MessageModel;
 import com.pigeonchat.R;
+import com.pigeonchat.Utility.Service;
 import com.pigeonchat.adapters.ChatAdapter;
 import com.pigeonchat.databinding.ActivityChatScreenBinding;
 import com.vanniktech.emoji.EmojiPopup;
@@ -42,12 +46,12 @@ public class ChatScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChatScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
         setSupportActionBar(binding.myToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         auth = FirebaseAuth.getInstance();
+
+        Service.startServiceIfNotRunning(this, FetchDataService.class);
 
 
         final String senderId = auth.getUid();
@@ -56,7 +60,6 @@ public class ChatScreen extends AppCompatActivity {
         String profilePic = getIntent().getStringExtra("profilePic");
 
         String receiveId = "1sGvehNh4HUud2jKbndHRdOlg3a2";
-
 
         final ArrayList<MessageModel> messageModels = new ArrayList<>();
         final ChatAdapter chatAdapter = new ChatAdapter(messageModels, this, receiveId);
@@ -72,6 +75,8 @@ public class ChatScreen extends AppCompatActivity {
                 popup.toggle();
             }
         });
+
+
 
 
         final String senderRoom = senderId + receiveId;
@@ -154,6 +159,14 @@ public class ChatScreen extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    public void StartService(View v){
+        startService(new Intent(getBaseContext(), FetchDataService.class));
+    }
+
+    public void stopService(View view) {
+        stopService(new Intent(getBaseContext(), FetchDataService.class));
     }
 
     @Override
