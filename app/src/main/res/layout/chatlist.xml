@@ -24,6 +24,7 @@
             app:srcCompat="@mipmap/ic_profile_placeholder_round" />
 
         <LinearLayout
+            android:id="@+id/textLinear"
             android:layout_width="260dp"
             android:layout_height="65dp"
             android:layout_marginTop="5dp"
@@ -35,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Yash Surendra Jadhav"
-                android:textSize="23dp"
+                android:textSize="20dp"
                 android:textStyle="bold" />
 
             <Space

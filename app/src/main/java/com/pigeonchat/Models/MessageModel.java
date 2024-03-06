@@ -1,13 +1,14 @@
 package com.pigeonchat.Models;
 
 public class MessageModel {
-    String uId, message, messageId;
+    String uId, message;
     Long timestamp;
+    boolean seen;
 
-    public MessageModel(String uId, String message, String messageId, Long timestamp) {
+    public MessageModel(String uId, String message, boolean seen, Long timestamp) {
         this.uId = uId;
         this.message = message;
-        this.messageId = messageId;
+        this.seen = seen;
         this.timestamp = timestamp;
     }
 
@@ -24,31 +25,31 @@ public class MessageModel {
         return uId;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
     public void setuId(String uId) {
         this.uId = uId;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
 }

@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -37,8 +38,7 @@ import java.util.Date;
 
 public class ChatScreen extends AppCompatActivity {
     ActivityChatScreenBinding binding;
-
-    DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("pigeon-98944-default-rtdb");
+    DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
     FirebaseAuth auth;
 
     @Override
@@ -53,13 +53,23 @@ public class ChatScreen extends AppCompatActivity {
 
         Service.startServiceIfNotRunning(this, FetchDataService.class);
 
-
         final String senderId = auth.getUid();
-        //String receiveId = getIntent().getStringExtra("userId");
-        String userName = getIntent().getStringExtra("userName");
+        String about = getIntent().getStringExtra("about");
+        String emailId = getIntent().getStringExtra("emailId");
         String profilePic = getIntent().getStringExtra("profilePic");
+        String userName = getIntent().getStringExtra("name");
+        String receiveId = getIntent().getStringExtra("userId");
+        String created_at = getIntent().getStringExtra("created_at");
+        String is_online = getIntent().getStringExtra("is_online");
 
-        String receiveId = "1sGvehNh4HUud2jKbndHRdOlg3a2";
+        binding.userName.setText(userName);
+
+        Glide
+                .with(getApplicationContext())
+                .load(profilePic)
+                .circleCrop()
+                .into(binding.profile);
+
 
         final ArrayList<MessageModel> messageModels = new ArrayList<>();
         final ChatAdapter chatAdapter = new ChatAdapter(messageModels, this, receiveId);
@@ -76,31 +86,27 @@ public class ChatScreen extends AppCompatActivity {
             }
         });
 
-
-
-
-        final String senderRoom = senderId + receiveId;
-        final String receiverRoom = receiveId + senderId;
+        final String senderRoom = senderId + "+" + receiveId;
+        final String receiverRoom = receiveId + "+" + senderId;
 
         db.child("chats")
-                        .child(senderRoom)
-                                .addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        messageModels.clear();
-                                        for(DataSnapshot snapshot1: snapshot.getChildren()){
-                                            MessageModel model = snapshot1.getValue(MessageModel.class);
-                                            model.setMessageId(snapshot1.getKey());
-                                            messageModels.add(model);
-                                        }
-                                        chatAdapter.notifyDataSetChanged();
-                                    }
+            .child(senderRoom)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        messageModels.clear();
+                        for(DataSnapshot snapshot1: snapshot.getChildren()){
+                            MessageModel model = snapshot1.getValue(MessageModel.class);
+                            messageModels.add(model);
+                        }
+                        chatAdapter.notifyDataSetChanged();
+                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                                    }
-                                });
+                    }
+                });
         binding.sendMsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,29 +116,84 @@ public class ChatScreen extends AppCompatActivity {
                 binding.msgContent.setText("");
 
                 EmojiTextView emojiTextView = (EmojiTextView) LayoutInflater
-                        .from(v.getContext())
-                                .inflate(R.layout.emoji_text_view,binding.bottom
-                                ,false);
+                    .from(v.getContext())
+                        .inflate(R.layout.emoji_text_view, binding.bottom,false);
 
                 //emojiTextView.setText(binding.msgContent.toString());
                 binding.bottom.addView(emojiTextView);
                 binding.msgContent.getText().clear();
 
-                db.child("chats")
-                        .child(senderRoom)
-                        .push()
-                        .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                db.child("chats")
-                                        .child(receiverRoom)
-                                        .push()
-                                        .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
+//                db.child("chats")
+//                    .child(senderRoom)
+//                    .child(String.valueOf(model.getTimestamp()))
+//                    .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void unused) {
+//                            db.child("chats")
+//                                .child(receiverRoom)
+//                                .child(String.valueOf(model.getTimestamp()))
+//                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void unused) {
+//
+//                                    }
+//                                });
+//                        }
+//                    });
 
-                                            }
-                                        });
+                db.child("users")
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                                    if(!snapshot1.hasChild(senderRoom)){
+                                        db.child("users")
+                                                .child(receiveId)
+                                                .child("contacts")
+                                                .child(auth.getUid()).setValue(true);
+
+                                        db.child("chats")
+                                                .child(senderRoom)
+                                                .child(String.valueOf(model.getTimestamp()))
+                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        db.child("chats")
+                                                                .child(receiverRoom)
+                                                                .child(String.valueOf(model.getTimestamp()))
+                                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void unused) {
+
+                                                                    }
+                                                                });
+                                                    }
+                                                });
+                                    }else{
+                                        db.child("chats")
+                                                .child(senderRoom)
+                                                .child(String.valueOf(model.getTimestamp()))
+                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        db.child("chats")
+                                                                .child(receiverRoom)
+                                                                .child(String.valueOf(model.getTimestamp()))
+                                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void unused) {
+
+                                                                    }
+                                                                });
+                                                    }
+                                                });
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
                             }
                         });
             }
@@ -142,7 +203,7 @@ public class ChatScreen extends AppCompatActivity {
         binding.myToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ChatScreen.this, "on Back", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 

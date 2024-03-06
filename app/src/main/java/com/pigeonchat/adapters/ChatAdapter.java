@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -78,7 +79,6 @@ public class ChatAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         MessageModel messageModel = messageModels.get(position);
 
-
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -89,15 +89,30 @@ public class ChatAdapter extends RecyclerView.Adapter {
                 LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
                 LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
 
+                if(!messageModels.get(position).getuId().equals(FirebaseAuth.getInstance().getUid())){
+                   layoutDelete.setVisibility(View.GONE);
+                }
+
                 layoutDelete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(context.getApplicationContext(), "click", Toast.LENGTH_SHORT).show();
-                        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("pigeon-98944-default-rtdb");
-                        String senderRoom = FirebaseAuth.getInstance().getUid() + receiverId;
+
+                        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
+                        String senderRoom = FirebaseAuth.getInstance().getUid() + "+" + receiverId;
+                        String receiverRoom = receiverId + "+" + FirebaseAuth.getInstance().getUid();
                         db.child("chats").child(senderRoom)
-                                .child(messageModel.getMessageId())
-                                .setValue(null);
+                                .child(messageModel.getTimestamp().toString())
+                                .child("message")
+                                .setValue("🚫 You deleted this message")
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                db.child("chats").child(receiverRoom)
+                                                        .child(messageModel.getTimestamp().toString())
+                                                        .child("message")
+                                                        .setValue("🚫 This message was deleted");
+                                            }
+                                        });
                         dialog.cancel();
                     }
                 });
@@ -133,6 +148,10 @@ public class ChatAdapter extends RecyclerView.Adapter {
         if(holder.getClass() == SenderViewHolder.class){
             ((SenderViewHolder)holder).senderMsg.setText(messageModel.getMessage());
 
+            if(((SenderViewHolder)holder).senderMsg.getText().toString().equals("🚫 You deleted this message")){
+                ((SenderViewHolder)holder).senderMsg.setTypeface(null, Typeface.BOLD_ITALIC);
+            }
+
             Date date = new Date(messageModel.getTimestamp());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a");
             String strDate = simpleDateFormat.format(date);
@@ -140,6 +159,9 @@ public class ChatAdapter extends RecyclerView.Adapter {
         }else{
             ((ReceiverViewHolder)holder).receiverMsg.setText(messageModel.getMessage());
 
+            if(((ReceiverViewHolder)holder).receiverMsg.getText().toString().equals("🚫 This message was deleted")){
+                ((ReceiverViewHolder)holder).receiverMsg.setTypeface(null, Typeface.BOLD_ITALIC);
+            }
             Date date = new Date(messageModel.getTimestamp());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a");
             String strDate = simpleDateFormat.format(date);
