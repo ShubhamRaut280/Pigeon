@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,18 +59,100 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentBind = FragmentChatsBinding.inflate(inflater, container, false);
-        return fragmentBind.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
 
-        refresh();
+        db.child("users")
+                .child(user.getUid())
+                .child("contacts")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        //refresh();
+
+                        DataModels = new ArrayList<>();
+                        chatRecyclerViewAdapter = new ChatRecyclerViewAdapter(DataModels, requireContext(), Chats.this, Chats.this);
+                        fragmentBind.rvChatRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                        fragmentBind.rvChatRecyclerView.setAdapter(chatRecyclerViewAdapter);
+
+                        db.child("users")
+                                .child(user.getUid())
+                                .child("contacts")
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        Log.e("Called", "meow");
+                                        for(DataSnapshot snap: snapshot.getChildren()){
+                                            Log.e("call: ", "Palko");
+                                            db.child("users")
+                                                    .child(snap.getKey())
+
+                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                                            DataModel modal = snapshot.getValue(DataModel.class);
+                                                            DataModels.add(modal);
+                                                            chatRecyclerViewAdapter.notifyDataSetChanged();
+
+                                                        }
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                                        }
+                                                    });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+//                                .addValueEventListener(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                        Log.e("Called", "meow");
+//                                        for(DataSnapshot snap: snapshot.getChildren()){
+//                                            Log.e("call: ", "Palko");
+//                                            db.child("users")
+//                                                    .child(snap.getKey())
+//
+//                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+//
+//                                                        @Override
+//                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//                                                            DataModel modal = snapshot.getValue(DataModel.class);
+//                                                            DataModels.add(modal);
+//                                                            chatRecyclerViewAdapter.notifyDataSetChanged();
+//
+//                                                        }
+//                                                        @Override
+//                                                        public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                                        }
+//                                                    });
+//                                        }
+//                                    }
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                    }
+//                                });
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
         fragmentBind.addContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,12 +160,23 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
             }
         });
 
+        return fragmentBind.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+
         //Log.e("working", DataModels.get(0).getAbout());
     }
 
     public void refresh(){
+        fragmentBind.rvChatRecyclerView.setAdapter(null);
         DataModels = new ArrayList<>();
         chatRecyclerViewAdapter = new ChatRecyclerViewAdapter(DataModels, requireContext(), this, this);
+
         fragmentBind.rvChatRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         fragmentBind.rvChatRecyclerView.setAdapter(chatRecyclerViewAdapter);
 
@@ -96,7 +190,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
 
                             db.child("users")
                                     .child(snap.getKey())
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    .addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -154,7 +248,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                                                             .child("contacts")
                                                             .child(snapshot1.getKey()).setValue(true);
 
-                                                    refresh();
+                                                    //refresh();
                                                     Log.e("ASD", snapshot1.child("emailId").getValue().toString());
                                                 }else{
                                                     Snackbar.make(fragmentBind.getRoot(), "User doesn't exist!", Snackbar.LENGTH_SHORT).show();

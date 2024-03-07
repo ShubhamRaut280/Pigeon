@@ -1,7 +1,5 @@
 package com.pigeonchat.adapters;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -9,7 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,71 +80,20 @@ public class ChatAdapter extends RecyclerView.Adapter {
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                final Dialog dialog = new Dialog(v.getContext());
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.bottom_sheet);
-
-                LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
-                LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
-
-                if(!messageModels.get(position).getuId().equals(FirebaseAuth.getInstance().getUid())){
-                   layoutDelete.setVisibility(View.GONE);
-                }
-
-                layoutDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
-                        String senderRoom = FirebaseAuth.getInstance().getUid() + "+" + receiverId;
-                        String receiverRoom = receiverId + "+" + FirebaseAuth.getInstance().getUid();
-                        db.child("chats").child(senderRoom)
-                                .child(messageModel.getTimestamp().toString())
-                                .child("message")
-                                .setValue("🚫 You deleted this message")
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                db.child("chats").child(receiverRoom)
-                                                        .child(messageModel.getTimestamp().toString())
-                                                        .child("message")
-                                                        .setValue("🚫 This message was deleted");
-                                            }
-                                        });
-                        dialog.cancel();
-                    }
-                });
-
-                layoutCopy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(holder.getClass() == SenderViewHolder.class){
-                            SpannableStringBuilder text = (SpannableStringBuilder) ((SenderViewHolder)holder).senderMsg.getText();
-                            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("label", text);
-                            clipboard.setPrimaryClip(clip);
-                            dialog.cancel();
-                        }else{
-                            SpannableStringBuilder text =  (SpannableStringBuilder)((ReceiverViewHolder)holder).receiverMsg.getText();
-                            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("label", text);
-                            clipboard.setPrimaryClip(clip);
-                            dialog.cancel();
-                        }
-                    }
-                });
-
-                dialog.show();
-                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                onLongPress(holder, holder.itemView, position);
                 return false;
             }
         });
 
         if(holder.getClass() == SenderViewHolder.class){
             ((SenderViewHolder)holder).senderMsg.setText(messageModel.getMessage());
+            ((SenderViewHolder)holder).senderMsg.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onLongPress(holder, holder.itemView.findViewById(R.id.senderText), position);
+                    return false;
+                }
+            });
 
             if(((SenderViewHolder)holder).senderMsg.getText().toString().equals("🚫 You deleted this message")){
                 ((SenderViewHolder)holder).senderMsg.setTypeface(null, Typeface.BOLD_ITALIC);
@@ -157,7 +104,15 @@ public class ChatAdapter extends RecyclerView.Adapter {
             String strDate = simpleDateFormat.format(date);
             ((SenderViewHolder)holder).senderTime.setText(strDate.toString());
         }else{
+
             ((ReceiverViewHolder)holder).receiverMsg.setText(messageModel.getMessage());
+            ((ReceiverViewHolder)holder).receiverMsg.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onLongPress(holder, holder.itemView.findViewById(R.id.receiverText), position);
+                    return false;
+                }
+            });
 
             if(((ReceiverViewHolder)holder).receiverMsg.getText().toString().equals("🚫 This message was deleted")){
                 ((ReceiverViewHolder)holder).receiverMsg.setTypeface(null, Typeface.BOLD_ITALIC);
@@ -174,40 +129,72 @@ public class ChatAdapter extends RecyclerView.Adapter {
         return messageModels.size();
     }
 
-    public void onLongClick(TextView view){
-        view.setOnLongClickListener(new View.OnLongClickListener() {
+    public void onLongPress(RecyclerView.ViewHolder holder, View view, int position){
+        MessageModel messageModel = messageModels.get(position);
+
+        final Dialog dialog = new Dialog(view.getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet);
+
+        LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
+        LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
+
+
+        if(!messageModels.get(position).getuId().equals(FirebaseAuth.getInstance().getUid())){
+           layoutDelete.setVisibility(View.GONE);
+        }
+
+        layoutDelete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public void onClick(View v) {
 
-                final Dialog dialog = new Dialog(v.getContext());
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.bottom_sheet);
-
-                LinearLayout layoutDelete = dialog.findViewById(R.id.layoutDelete);
-                LinearLayout layoutCopy = dialog.findViewById(R.id.layoutCopy);
-                layoutCopy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        SpannableStringBuilder text = (SpannableStringBuilder) view.getText();
-                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("label", text);
-                        clipboard.setPrimaryClip(clip);
-
-                        dialog.cancel();
-
-                    }
-                });
-
-                dialog.show();
-                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                dialog.getWindow().setGravity(Gravity.BOTTOM);
-
-                return false;
+                DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
+                String senderRoom = FirebaseAuth.getInstance().getUid() + "+" + receiverId;
+                String receiverRoom = receiverId + "+" + FirebaseAuth.getInstance().getUid();
+                db.child("chats").child(senderRoom)
+                        .child(messageModel.getTimestamp().toString())
+                        .child("message")
+                        .setValue("🚫 You deleted this message")
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        db.child("chats").child(receiverRoom)
+                                                .child(messageModel.getTimestamp().toString())
+                                                .child("message")
+                                                .setValue("🚫 This message was deleted");
+                                    }
+                                });
+                dialog.cancel();
             }
         });
+
+        layoutCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(holder.getClass() == SenderViewHolder.class){
+                    SpannableStringBuilder text = (SpannableStringBuilder) ((SenderViewHolder)holder).senderMsg.getText();
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", text);
+                    clipboard.setPrimaryClip(clip);
+                    dialog.cancel();
+                }else{
+                    SpannableStringBuilder text =  (SpannableStringBuilder)((ReceiverViewHolder)holder).receiverMsg.getText();
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("label", text);
+                    clipboard.setPrimaryClip(clip);
+                    dialog.cancel();
+                }
+            }
+        });
+
+
+
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+
     }
 
     // Receiver
@@ -220,7 +207,6 @@ public class ChatAdapter extends RecyclerView.Adapter {
             receiverMsg = itemView.findViewById(R.id.receiverText);
             receiverTime = itemView.findViewById(R.id.receiverTime);
 
-            onLongClick(receiverMsg);
         }
     }
 
@@ -234,7 +220,6 @@ public class ChatAdapter extends RecyclerView.Adapter {
             senderMsg = itemView.findViewById(R.id.senderText);
             senderTime = itemView.findViewById(R.id.senderTime);
 
-            onLongClick(senderMsg);
         }
     }
 }

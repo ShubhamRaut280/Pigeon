@@ -87,7 +87,8 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth(account.getIdToken());
             } catch (ApiException e) {
                 int statusCode = e.getStatusCode();
-                Toast.makeText(this, "Error code: " + statusCode, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error code: " + e.toString(), Toast.LENGTH_SHORT).show();
+                Log.e("ERRRORR", e.toString());
             }
 
         }

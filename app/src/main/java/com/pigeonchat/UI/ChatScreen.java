@@ -107,6 +107,8 @@ public class ChatScreen extends AppCompatActivity {
 
                     }
                 });
+
+
         binding.sendMsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,23 +125,6 @@ public class ChatScreen extends AppCompatActivity {
                 binding.bottom.addView(emojiTextView);
                 binding.msgContent.getText().clear();
 
-//                db.child("chats")
-//                    .child(senderRoom)
-//                    .child(String.valueOf(model.getTimestamp()))
-//                    .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                        @Override
-//                        public void onSuccess(Void unused) {
-//                            db.child("chats")
-//                                .child(receiverRoom)
-//                                .child(String.valueOf(model.getTimestamp()))
-//                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void unused) {
-//
-//                                    }
-//                                });
-//                        }
-//                    });
 
                 db.child("users")
                         .addListenerForSingleValueEvent(new ValueEventListener() {
