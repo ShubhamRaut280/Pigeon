@@ -16,33 +16,35 @@
     android:maxWidth="310dp"
     android:maxHeight="400dp"
     android:minHeight="0dp"
-    android:minWidth="55dp">
+    android:minWidth="70dp">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/receiverText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="8dp"
         android:inputType="textLongMessage|textMultiLine"
         android:maxWidth="270dp"
         android:minWidth="0dp"
-        android:text="hii"
-        app:layout_constraintBottom_toTopOf="@+id/receiverTime"
-        app:layout_constraintEnd_toEndOf="@id/receiverTime"
+        android:text="."
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/receiverTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="3dp"
         android:text="10:35 PM"
         android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/receiverText"
         app:layout_constraintEnd_toEndOf="parent" />
 
 <!--    <androidx.constraintlayout.widget.Guideline-->

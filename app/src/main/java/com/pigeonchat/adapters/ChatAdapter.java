@@ -5,20 +5,25 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -87,6 +92,14 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
         if(holder.getClass() == SenderViewHolder.class){
             ((SenderViewHolder)holder).senderMsg.setText(messageModel.getMessage());
+
+            Log.e("msgStatus", String.valueOf(messageModel.isSeen()));
+            if(messageModel.isSeen()){
+                ((SenderViewHolder)holder).seen.setColorFilter(ContextCompat.getColor(context, R.color.blue), PorterDuff.Mode.MULTIPLY);
+            }else{
+                ((SenderViewHolder)holder).seen.clearColorFilter();
+            }
+
             ((SenderViewHolder)holder).senderMsg.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -214,12 +227,13 @@ public class ChatAdapter extends RecyclerView.Adapter {
     public class SenderViewHolder extends RecyclerView.ViewHolder{
 
         TextView senderMsg, senderTime;
+        ImageView seen;
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
 
             senderMsg = itemView.findViewById(R.id.senderText);
             senderTime = itemView.findViewById(R.id.senderTime);
-
+            seen = itemView.findViewById(R.id.msgStatus);
         }
     }
 }

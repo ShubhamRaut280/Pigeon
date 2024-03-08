@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -97,7 +98,29 @@ public class ChatScreen extends AppCompatActivity {
                         messageModels.clear();
                         for(DataSnapshot snapshot1: snapshot.getChildren()){
                             MessageModel model = snapshot1.getValue(MessageModel.class);
+
+                            Log.e("stat", String.valueOf(model.isSeen()));
+
+                            if(!snapshot1.child("uId").getValue().equals(auth.getUid())){
+                                model.setSeen(true);
+                                db.child("chats")
+                                                .child(senderRoom)
+                                                        .child(snapshot1.getKey())
+                                                                .child("seen").setValue(true);
+
+                                db.child("chats")
+                                        .child(receiverRoom)
+                                        .child(snapshot1.getKey())
+                                        .child("seen").setValue(true);
+
+
+                                Log.e("time", snapshot1.getKey());
+                                Log.e("chatting", (String) snapshot1.child("message").getValue());
+                            }
+
                             messageModels.add(model);
+
+
                         }
                         chatAdapter.notifyDataSetChanged();
                     }

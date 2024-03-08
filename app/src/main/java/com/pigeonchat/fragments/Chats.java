@@ -44,6 +44,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemClickListener, ChatRecyclerViewAdapter.OnItemLongClickListener {
 
@@ -97,7 +98,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                                                             DataModel modal = snapshot.getValue(DataModel.class);
                                                             DataModels.add(modal);
                                                             chatRecyclerViewAdapter.notifyDataSetChanged();
-
+                                                            Log.e("Count", String.valueOf(DataModels.size()));
                                                         }
                                                         @Override
                                                         public void onCancelled(@NonNull DatabaseError error) {
@@ -301,8 +302,8 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                 Toast.makeText(getContext(), "info", Toast.LENGTH_SHORT).show();
             }
         });
-
         alert.setView(v);
+        Objects.requireNonNull(alert.create().getWindow()).setBackgroundDrawableResource(R.drawable.shape_rounded);
         alert.show();
     }
 
@@ -317,6 +318,8 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
         intent.putExtra("userId", DataModels.get(position).getUserId());
         intent.putExtra("created_at", DataModels.get(position).getCreated_at());
         intent.putExtra("is_online", DataModels.get(position).is_online());
+
+
         startActivity(intent);
     }
 
