@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,6 +43,8 @@ public class ChatScreen extends AppCompatActivity {
     DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
     FirebaseAuth auth;
 
+    boolean active;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,8 @@ public class ChatScreen extends AppCompatActivity {
         setContentView(binding.getRoot());
         setSupportActionBar(binding.myToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        active = true;
 
         auth = FirebaseAuth.getInstance();
 
@@ -61,7 +66,7 @@ public class ChatScreen extends AppCompatActivity {
         String userName = getIntent().getStringExtra("name");
         String receiveId = getIntent().getStringExtra("userId");
         String created_at = getIntent().getStringExtra("created_at");
-        String is_online = getIntent().getStringExtra("is_online");
+        boolean is_online = false;
 
         binding.userName.setText(userName);
 
@@ -98,29 +103,8 @@ public class ChatScreen extends AppCompatActivity {
                         messageModels.clear();
                         for(DataSnapshot snapshot1: snapshot.getChildren()){
                             MessageModel model = snapshot1.getValue(MessageModel.class);
-
-                            Log.e("stat", String.valueOf(model.isSeen()));
-
-                            if(!snapshot1.child("uId").getValue().equals(auth.getUid())){
-                                model.setSeen(true);
-                                db.child("chats")
-                                                .child(senderRoom)
-                                                        .child(snapshot1.getKey())
-                                                                .child("seen").setValue(true);
-
-                                db.child("chats")
-                                        .child(receiverRoom)
-                                        .child(snapshot1.getKey())
-                                        .child("seen").setValue(true);
-
-
-                                Log.e("time", snapshot1.getKey());
-                                Log.e("chatting", (String) snapshot1.child("message").getValue());
-                            }
-
+                            //Log.e("stat", String.valueOf(model.isSeen()))
                             messageModels.add(model);
-
-
                         }
                         chatAdapter.notifyDataSetChanged();
                     }
@@ -130,6 +114,40 @@ public class ChatScreen extends AppCompatActivity {
 
                     }
                 });
+
+        //Log.e(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",auth.getCurrentUser().getDisplayName());
+
+        db.child("chats").child(senderRoom)
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                    if (!snapshot1.child("uId").getValue().equals(auth.getUid())) {
+                                        Log.e(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", (String) snapshot1.child("uId").getValue());
+
+                                        if(active){
+                                            db.child("chats")
+                                                    .child(senderRoom)
+                                                    .child(snapshot1.getKey())
+                                                    .child("seen").setValue(true);
+
+                                            db.child("chats")
+                                                    .child(receiverRoom)
+                                                    .child(snapshot1.getKey())
+                                                    .child("seen").setValue(true);
+                                        }
+
+                                        Log.e("KAJUMA", snapshot1.child("message").getValue() + "  :  " + snapshot1.getKey());
+
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
 
 
         binding.sendMsg.setOnClickListener(new View.OnClickListener() {
@@ -208,6 +226,24 @@ public class ChatScreen extends AppCompatActivity {
         });
 
 
+        db.child("users")
+                .child(receiveId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean val = (boolean) snapshot.child("is_online").getValue();
+                        if(val){
+                            binding.onlineIndicator.setVisibility(View.VISIBLE);
+                        }else{
+                            binding.onlineIndicator.setVisibility(View.GONE);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
         binding.myToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,6 +264,24 @@ public class ChatScreen extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        active = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        active = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        active = false;
     }
 
     public void StartService(View v){
