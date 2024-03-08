@@ -30,24 +30,32 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
 
+    boolean online;
     FirebaseAuth auth;
     FirebaseUser user;
-
     DatabaseReference db;
     private ActivityMainBinding bind;
     private MainViewPagerAdapter mainViewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         bind = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
+        online = true;
+
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
         db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
+
+        db.child("users")
+                                    .child(user.getUid())
+                                    .child("is_online").setValue(true);
+
 
         mainViewPagerAdapter = new MainViewPagerAdapter(this);
 
@@ -62,8 +70,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        online = false;
 
-
-
-
+        db.child("users")
+                .child(user.getUid())
+                .child("is_online").setValue(false);
+    }
 }

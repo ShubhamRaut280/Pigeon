@@ -93,7 +93,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         if(holder.getClass() == SenderViewHolder.class){
             ((SenderViewHolder)holder).senderMsg.setText(messageModel.getMessage());
 
-            Log.e("msgStatus", String.valueOf(messageModel.isSeen()));
+
             if(messageModel.isSeen()){
                 ((SenderViewHolder)holder).seen.setColorFilter(ContextCompat.getColor(context, R.color.blue), PorterDuff.Mode.MULTIPLY);
             }else{

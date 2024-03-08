@@ -89,7 +89,6 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                                             Log.e("call: ", "Palko");
                                             db.child("users")
                                                     .child(snap.getKey())
-
                                                     .addListenerForSingleValueEvent(new ValueEventListener() {
 
                                                         @Override
@@ -318,7 +317,6 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
         intent.putExtra("userId", DataModels.get(position).getUserId());
         intent.putExtra("created_at", DataModels.get(position).getCreated_at());
         intent.putExtra("is_online", DataModels.get(position).is_online());
-
 
         startActivity(intent);
     }
