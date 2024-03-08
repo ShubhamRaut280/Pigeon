@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
     <application
         android:name=".MyApp"
         android:allowBackup="true"
@@ -14,6 +19,9 @@
         android:theme="@style/Theme.Pigeon"
         tools:targetApi="31">
         <activity
+            android:name=".activities.VideocallActivity"
+            android:exported="false" />
+        <activity
             android:name=".Login.LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -25,11 +33,10 @@
         <activity
             android:name=".UI.ChatScreen"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
 
         <service android:name=".FetchDataService" />
     </application>

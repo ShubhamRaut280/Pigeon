@@ -49,7 +49,7 @@ public class FetchDataService extends Service {
                 if(snapshot.exists()) {
                     Map<String, Object> dataMap = (Map<String, Object>) snapshot.getValue();
 
-                    String name = dataMap.get("name").toString();
+                    String name = (String) dataMap.get("name");
 
                     Toast.makeText(FetchDataService.this, name, Toast.LENGTH_SHORT).show();
                 }

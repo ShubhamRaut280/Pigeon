@@ -6,6 +6,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,6 +32,7 @@ import com.pigeonchat.FetchDataService;
 import com.pigeonchat.Models.MessageModel;
 import com.pigeonchat.R;
 import com.pigeonchat.Utility.Service;
+import com.pigeonchat.activities.VideocallActivity;
 import com.pigeonchat.adapters.ChatAdapter;
 import com.pigeonchat.databinding.ActivityChatScreenBinding;
 import com.vanniktech.emoji.EmojiPopup;
@@ -39,8 +43,10 @@ import java.util.Date;
 
 public class ChatScreen extends AppCompatActivity {
     ActivityChatScreenBinding binding;
-    DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
-    FirebaseAuth auth;
+    final DatabaseReference db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    final String senderId = auth.getUid();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +57,16 @@ public class ChatScreen extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         auth = FirebaseAuth.getInstance();
-
         Service.startServiceIfNotRunning(this, FetchDataService.class);
 
-        final String senderId = auth.getUid();
+
+       init();
+
+        monitorVideocallRequests();
+    }
+
+    private void init(){
+
         String about = getIntent().getStringExtra("about");
         String emailId = getIntent().getStringExtra("emailId");
         String profilePic = getIntent().getStringExtra("profilePic");
@@ -62,6 +74,7 @@ public class ChatScreen extends AppCompatActivity {
         String receiveId = getIntent().getStringExtra("userId");
         String created_at = getIntent().getStringExtra("created_at");
         String is_online = getIntent().getStringExtra("is_online");
+
 
         binding.userName.setText(userName);
 
@@ -91,7 +104,7 @@ public class ChatScreen extends AppCompatActivity {
         final String receiverRoom = receiveId + "+" + senderId;
 
         db.child("chats")
-            .child(senderRoom)
+                .child(senderRoom)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -104,9 +117,9 @@ public class ChatScreen extends AppCompatActivity {
                             if(!snapshot1.child("uId").getValue().equals(auth.getUid())){
                                 model.setSeen(true);
                                 db.child("chats")
-                                                .child(senderRoom)
-                                                        .child(snapshot1.getKey())
-                                                                .child("seen").setValue(true);
+                                        .child(senderRoom)
+                                        .child(snapshot1.getKey())
+                                        .child("seen").setValue(true);
 
                                 db.child("chats")
                                         .child(receiverRoom)
@@ -141,7 +154,7 @@ public class ChatScreen extends AppCompatActivity {
                 binding.msgContent.setText("");
 
                 EmojiTextView emojiTextView = (EmojiTextView) LayoutInflater
-                    .from(v.getContext())
+                        .from(v.getContext())
                         .inflate(R.layout.emoji_text_view, binding.bottom,false);
 
                 //emojiTextView.setText(binding.msgContent.toString());
@@ -222,14 +235,19 @@ public class ChatScreen extends AppCompatActivity {
                     Toast.makeText(ChatScreen.this, "voice click", Toast.LENGTH_SHORT).show();
                     return true;
                 }else if(item.getItemId() == R.id.videoCall){
-                    Toast.makeText(ChatScreen.this, "video click", Toast.LENGTH_SHORT).show();
+
+                    Log.d("videocall", "videocall  clicked ");
+                    startVideocall();
+
+                    Toast.makeText(ChatScreen.this, "calling", Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 return false;
             }
         });
-    }
 
+
+    }
     public void StartService(View v){
         startService(new Intent(getBaseContext(), FetchDataService.class));
     }
@@ -250,7 +268,106 @@ public class ChatScreen extends AppCompatActivity {
         int id = item.getItemId();
 
 
-
         return super.onOptionsItemSelected(item);
     }
+
+    private void startVideocall() {
+
+        String receiver  = getIntent().getStringExtra("userId");
+        String sender = senderId;
+
+        Intent i = new Intent(ChatScreen.this, VideocallActivity.class);
+        i.putExtra("sender", sender);
+        i.putExtra("receiver", receiver);
+
+        startActivity(i);
+    }
+
+
+    private void monitorVideocallRequests()
+    {
+
+        Log.d("videocall", "monitoring");
+
+        String user = senderId;
+        Log.d("videocall", "monitoring for"+user);
+
+        DatabaseReference ref =db.child("callRequests");
+        ref.orderByChild(user).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists())
+                {
+                    Log.d("videocall", "there are changes in doc");
+
+                    DataSnapshot snap = snapshot.child(user);
+                        String connId = snap.child("connectionId").getValue(String.class);
+                        String sender = snap.child("sender").getValue(String.class);
+                        boolean callAccepted = Boolean.TRUE.equals(snap.child("callAccepted").getValue(boolean.class));
+                        boolean isHangout = Boolean.TRUE.equals(snap.child("isHangout").getValue(boolean.class));
+                        boolean callRejected = Boolean.TRUE.equals(snap.child("callRejected").getValue(boolean.class));
+
+                    Log.d("videocall", "onCreate: from videocall connectin id "+connId+ " sender : " +sender );
+
+
+                    if (!isHangout && !callRejected )
+                        {
+                            initVideocallReq(sender, user,  connId);
+                        }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void showVideocallRequest(String sender,String user, String connId) {
+        String receiver  = getIntent().getStringExtra("userId");
+
+        Intent i = new Intent(ChatScreen.this, VideocallActivity.class);
+        i.putExtra("sender", sender);
+        i.putExtra("receiver", user);
+        i.putExtra("connId", connId);
+
+        startActivity(i);
+    }
+
+
+    public  void initVideocallReq(String sender,String user, String connId){
+
+
+            Dialog dialogBox = new Dialog(this);
+            dialogBox.setContentView(R.layout.dialoguebox_for_video_call_req_alert);
+
+
+            dialogBox.getWindow().setBackgroundDrawableResource(R.drawable.custom_dialog_background);
+
+            dialogBox.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+
+            MaterialButton confirm = dialogBox.findViewById(R.id.confirmButton);
+
+
+
+            if (confirm != null ) {
+                confirm.setOnClickListener(v -> {
+                    showVideocallRequest(sender, user,  connId);
+                    dialogBox.dismiss();
+
+                });
+
+
+            } else {
+                dialogBox.dismiss();
+            }
+
+            if ((this instanceof AppCompatActivity && !this.isFinishing()) && !dialogBox.isShowing())
+                dialogBox.show();
+
+        }
+
 }

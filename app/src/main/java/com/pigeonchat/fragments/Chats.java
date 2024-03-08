@@ -242,7 +242,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             for(DataSnapshot snapshot1: snapshot.getChildren()){
 
-                                                if(editText.getText().toString().equals(snapshot1.child("emailId").getValue().toString())){
+                                                if(editText.getText().toString().equals(snapshot1.child("emailId").getValue())){
 
                                                     db.child("users")
                                                             .child(user.getUid())
