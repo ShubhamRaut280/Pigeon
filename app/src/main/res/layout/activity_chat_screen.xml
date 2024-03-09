@@ -50,22 +50,39 @@
                         android:layout_margin="5dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:scaleType="centerCrop"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_profile_placeholder_fg" />
+                        app:srcCompat="@drawable/ic_profile_placeholder_fg"
+                        />
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/user_name"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="user_name"
-                        android:textColor="@color/black"
-                        android:layout_gravity="center"
-                        app:layout_constraintEnd_toEndOf="@+id/profile"
-                        app:layout_constraintStart_toStartOf="@+id/profile"
-                        app:layout_constraintTop_toBottomOf="@+id/profile" />
+                        android:orientation="horizontal"
+                        android:layout_gravity="center">
+
+                        <ImageView
+                            android:id="@+id/onlineIndicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/ic_online"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="3dp"/>
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/user_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="user_name"
+                            android:textColor="@color/black"
+                            android:layout_gravity="center"
+                            android:textAlignment="center"
+                            app:layout_constraintEnd_toEndOf="@+id/profile"
+                            app:layout_constraintStart_toStartOf="@+id/profile"
+                            app:layout_constraintTop_toBottomOf="@+id/profile" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
