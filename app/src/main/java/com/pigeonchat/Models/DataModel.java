@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataModel {
-    private String about, emailId, image, name, userId;
+    private String about, emailId, image, name, userId, token;
     long created_at;
     boolean is_online;
 
@@ -12,7 +12,7 @@ public class DataModel {
 //        return contacts;
 //    }
 
-    public DataModel(String about, String emailId, String image, String name, String userId, long created_at, boolean is_online) {
+    public DataModel(String about, String emailId, String image, String name, String userId, long created_at, boolean is_online, String token) {
         this.about = about;
         this.emailId = emailId;
         this.image = image;
@@ -20,6 +20,7 @@ public class DataModel {
         this.userId = userId;
         this.created_at = created_at;
         this.is_online = is_online;
+        this.token = token;
 
     }
 
@@ -28,6 +29,10 @@ public class DataModel {
 
     public String getAbout() {
         return about;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public String getEmailId() {

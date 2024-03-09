@@ -1,16 +1,14 @@
 package com.pigeonchat.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,27 +21,23 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.pigeonchat.MainActivity;
 import com.pigeonchat.UI.ChatScreen;
 import com.pigeonchat.adapters.ChatRecyclerViewAdapter;
 import com.pigeonchat.Models.DataModel;
 import com.pigeonchat.R;
 import com.pigeonchat.databinding.FragmentChatsBinding;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemClickListener, ChatRecyclerViewAdapter.OnItemLongClickListener {
@@ -84,9 +78,9 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                                 .addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        Log.e("Called", "meow");
+
                                         for(DataSnapshot snap: snapshot.getChildren()){
-                                            Log.e("call: ", "Palko");
+
                                             db.child("users")
                                                     .child(snap.getKey())
                                                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -97,7 +91,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                                                             DataModel modal = snapshot.getValue(DataModel.class);
                                                             DataModels.add(modal);
                                                             chatRecyclerViewAdapter.notifyDataSetChanged();
-                                                            Log.e("Count", String.valueOf(DataModels.size()));
+
                                                         }
                                                         @Override
                                                         public void onCancelled(@NonNull DatabaseError error) {
@@ -156,7 +150,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
         fragmentBind.addContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showInputRenameDialog();
+                showDialog();
             }
         });
 
@@ -214,66 +208,57 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
                 });
     }
 
-    public void showInputRenameDialog(){
+    public void showDialog(){
 
-        // get prompts.xml view
-        LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-        View promptView = layoutInflater.inflate(R.layout.input_dialog, null);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-        alertDialogBuilder.setView(promptView);
+        Dialog dialogBox = new Dialog(getContext());
+        dialogBox.setContentView(R.layout.input_dialog);
+        dialogBox.getWindow().setBackgroundDrawableResource(R.drawable.custom_dialog_background);
+        dialogBox.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        final EditText editText = (EditText) promptView.findViewById(R.id.inputText);
-        final TextView inputText = (TextView) promptView.findViewById(R.id.headText);
+        MaterialButton addUser = dialogBox.findViewById(R.id.addUserButton);
+        EditText email = dialogBox.findViewById(R.id.inputText);
+        addUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(email.getText().toString().equals("") || email.getText().toString().contains(" ")){
+                    Toast.makeText(getContext(), "Please enter valid email ID", Toast.LENGTH_SHORT).show();
+                }else{
+                    db.child("users")
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-        editText.setHint("someone@gmail.com");
-        inputText.setText("Enter Email ID of the User");
-        // setup a dialog window
-        alertDialogBuilder.setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                                    boolean exist = true;
+                                    for(DataSnapshot snapshot1: snapshot.getChildren()){
 
-                        if(editText.getText().toString().equals("") || editText.getText().toString().contains(" ")){
-                            Toast.makeText(getContext(), "Please enter valid email ID", Toast.LENGTH_SHORT).show();
-                        }else{
-                            db.child("users")
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            for(DataSnapshot snapshot1: snapshot.getChildren()){
+                                        if(email.getText().toString().equals(snapshot1.child("emailId").getValue())){
+                                            exist = true;
+                                            db.child("users")
+                                                    .child(user.getUid())
+                                                    .child("contacts")
+                                                    .child(snapshot1.getKey()).setValue(true);
+                                            dialogBox.dismiss();
+                                            break;
 
-                                                if(editText.getText().toString().equals(snapshot1.child("emailId").getValue())){
-
-                                                    db.child("users")
-                                                            .child(user.getUid())
-                                                            .child("contacts")
-                                                            .child(snapshot1.getKey()).setValue(true);
-
-                                                    //refresh();
-                                                    Log.e("ASD", snapshot1.child("emailId").getValue().toString());
-                                                }else{
-                                                    Snackbar.make(fragmentBind.getRoot(), "User doesn't exist!", Snackbar.LENGTH_SHORT).show();
-                                                }
-                                            }
+                                        }else{
+                                            exist = false;
                                         }
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                    if(!exist){
+                                        Snackbar.make(fragmentBind.getRoot(), "User doesn't exist!", Snackbar.LENGTH_SHORT).show();
+                                        dialogBox.dismiss();
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
 
-                                        }
-                                    });
-                        }
+                                }
+                            });
+                }
+            }
+        });
 
-                    }
-                })
-                .setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-        // create an alert dialog
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
+        dialogBox.show();
 
     }
 
@@ -317,6 +302,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
         intent.putExtra("userId", DataModels.get(position).getUserId());
         intent.putExtra("created_at", DataModels.get(position).getCreated_at());
         intent.putExtra("is_online", DataModels.get(position).is_online());
+        intent.putExtra("token", DataModels.get(position).getToken());
 
         startActivity(intent);
     }

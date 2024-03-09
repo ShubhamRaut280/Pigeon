@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.pigeonchat.adapters.MainViewPagerAdapter;
 import com.pigeonchat.databinding.ActivityMainBinding;
 import com.pigeonchat.fragments.Chats;
@@ -67,7 +68,18 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(bind.tbLayout, bind.vPgr2, (tab, position) -> {
             tab.setText(mainViewPagerAdapter.getPageTitle(position));
         }).attach();
+        
+        //getFCMToken();
 
+    }
+
+    private void getFCMToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener( task->{
+            if(task.isSuccessful()){
+                String token = task.getResult();
+                Log.e("My token", token);
+            }
+        });
     }
 
     @Override

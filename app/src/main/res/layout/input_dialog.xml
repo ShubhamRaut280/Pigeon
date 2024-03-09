@@ -4,6 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:backgroundTint="@color/material_dynamic_tertiary90"
+    android:background="@drawable/round_corner_theme"
     android:padding="20dp">
 
     <TextView
@@ -36,6 +40,21 @@
             android:inputType="textShortMessage"
             android:background="@android:color/transparent"
             android:hint="someone@gmail.com"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_gravity="right">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addUserButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"/>
+
 
     </LinearLayout>
 

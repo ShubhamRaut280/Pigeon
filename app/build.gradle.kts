@@ -55,7 +55,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("com.vanniktech:emoji-google:0.7.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

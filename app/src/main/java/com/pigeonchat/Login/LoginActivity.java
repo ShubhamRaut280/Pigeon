@@ -28,6 +28,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.pigeonchat.MainActivity;
 import com.pigeonchat.R;
 import com.pigeonchat.UI.ChatScreen;
@@ -132,14 +133,19 @@ public class LoginActivity extends AppCompatActivity {
         updates.put("is_online", false);
         updates.put("name", user.getDisplayName());
         updates.put("userId", user.getUid());
+        updates.put("token", "lol");
 
-        db.child(user.getUid())
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task->{
+            if(task.isSuccessful()){
+                String token = task.getResult();
+                Log.e("My token", token);
+                updates.put("token", token);
+
+                db.child(user.getUid())
                         .updateChildren(updates)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
-                            public void onSuccess(Void unused) {
-                                //Toast.makeText(LoginActivity.this, "Login Successfull", Toast.LENGTH_SHORT).show();
-                            }
+                            public void onSuccess(Void unused) {}
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -147,8 +153,9 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                             }
                         });
+            }
+        });
 
-        Log.e("DB", String.valueOf(user.getPhotoUrl()));
     }
 
     @Override
