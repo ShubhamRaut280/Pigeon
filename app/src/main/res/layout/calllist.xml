@@ -49,7 +49,8 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/call_received_icon"/>
+                    android:src="@drawable/call_received_icon"
+                    app:tint="@color/material_dynamic_primary40" />
 
 
                 <Space
@@ -73,7 +74,7 @@
         android:layout_height="30dp"
         android:backgroundTint="@android:color/transparent"
         android:src="@drawable/phonecall"
-        android:tint="@color/black"
+        android:tint="@color/material_dynamic_primary40"
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -12,6 +12,8 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+
+
         // Applies Material theme to app
         DynamicColors.applyToActivitiesIfAvailable(this);
 

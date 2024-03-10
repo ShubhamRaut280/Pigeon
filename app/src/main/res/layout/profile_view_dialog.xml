@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@android:color/transparent"
-        android:src="@android:drawable/ic_menu_info_details"/>
+        android:src="@android:drawable/ic_menu_info_details"
+        android:tint="@color/material_dynamic_primary40"/>
 
 </LinearLayout>

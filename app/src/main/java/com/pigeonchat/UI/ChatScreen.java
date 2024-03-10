@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -188,83 +190,89 @@ public class ChatScreen extends AppCompatActivity {
                             }
                         });
 
+        //binding.msgContent.getText().toString();
+        if(!binding.msgContent.getText().toString().equals("")){
+            binding.sendMsg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-        binding.sendMsg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = binding.msgContent.getText().toString();
-                final MessageModel model = new MessageModel(senderId, message);
-                model.setTimestamp(new Date().getTime());
-                binding.msgContent.setText("");
+                    String message = binding.msgContent.getText().toString();
+                    final MessageModel model = new MessageModel(senderId, message);
+                    model.setTimestamp(new Date().getTime());
+                    binding.msgContent.setText("");
 
-                EmojiTextView emojiTextView = (EmojiTextView) LayoutInflater
-                        .from(v.getContext())
-                        .inflate(R.layout.emoji_text_view, binding.bottom,false);
+                    EmojiTextView emojiTextView = (EmojiTextView) LayoutInflater
+                            .from(v.getContext())
+                            .inflate(R.layout.emoji_text_view, binding.bottom,false);
 
-                //emojiTextView.setText(binding.msgContent.toString());
-                binding.bottom.addView(emojiTextView);
-                binding.msgContent.getText().clear();
+                    //emojiTextView.setText(binding.msgContent.toString());
+                    binding.bottom.addView(emojiTextView);
+                    binding.msgContent.getText().clear();
 
 
-                db.child("users")
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                for(DataSnapshot snapshot1: snapshot.getChildren()){
-                                    if(!snapshot1.hasChild(senderRoom)){
-                                        db.child("users")
-                                                .child(receiveId)
-                                                .child("contacts")
-                                                .child(auth.getUid()).setValue(true);
+                    db.child("users")
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for(DataSnapshot snapshot1: snapshot.getChildren()){
+                                        if(!snapshot1.hasChild(senderRoom)){
+                                            db.child("users")
+                                                    .child(receiveId)
+                                                    .child("contacts")
+                                                    .child(auth.getUid()).setValue(true);
 
-                                        db.child("chats")
-                                                .child(senderRoom)
-                                                .child(String.valueOf(model.getTimestamp()))
-                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void unused) {
-                                                        db.child("chats")
-                                                                .child(receiverRoom)
-                                                                .child(String.valueOf(model.getTimestamp()))
-                                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void unused) {
-                                                                        //sendNotification(model);
-                                                                    }
-                                                                });
-                                                    }
-                                                });
-                                    }else{
-                                        db.child("chats")
-                                                .child(senderRoom)
-                                                .child(String.valueOf(model.getTimestamp()))
-                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void unused) {
+                                            db.child("chats")
+                                                    .child(senderRoom)
+                                                    .child(String.valueOf(model.getTimestamp()))
+                                                    .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            db.child("chats")
+                                                                    .child(receiverRoom)
+                                                                    .child(String.valueOf(model.getTimestamp()))
+                                                                    .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void unused) {
+                                                                            //sendNotification(model);
+                                                                        }
+                                                                    });
+                                                        }
+                                                    });
+                                        }else{
+                                            db.child("chats")
+                                                    .child(senderRoom)
+                                                    .child(String.valueOf(model.getTimestamp()))
+                                                    .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
 
-                                                        db.child("chats")
-                                                                .child(receiverRoom)
-                                                                .child(String.valueOf(model.getTimestamp()))
-                                                                .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void unused) {
+                                                            db.child("chats")
+                                                                    .child(receiverRoom)
+                                                                    .child(String.valueOf(model.getTimestamp()))
+                                                                    .setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void unused) {
 
-                                                                    }
-                                                                });
-                                                    }
-                                                });
+                                                                        }
+                                                                    });
+                                                        }
+                                                    });
+                                        }
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
 
-                            }
-                        });
-                sendNotification(model);
-            }
-        });
+                                }
+                            });
+                    sendNotification(model);
+                }
+            });
+        }
+
+
+
 
 
         db.child("users")

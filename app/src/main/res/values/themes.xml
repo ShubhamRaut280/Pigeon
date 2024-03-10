@@ -3,10 +3,11 @@
     <style name="Base.Theme.Pigeon" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<!--        <item name="colorPrimary"-->
+
     </style>
 
     <style name="Theme.Pigeon" parent="Base.Theme.Pigeon" />
-
     <style name="SoftCorner">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">25dp</item>
@@ -17,12 +18,5 @@
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
     </style>
-
-    <style name="Theme.Pigeon.Fullscreen" parent="Theme.Pigeon">
-        <item name="android:actionBarStyle">@style/Widget.Theme.Pigeon.ActionBar.Fullscreen</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@null</item>
-    </style>
-
-
+    
 </resources>

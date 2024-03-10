@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:layout_marginStart="20dp"
     android:layout_marginEnd="20dp"
-    android:backgroundTint="@color/material_dynamic_tertiary90"
     android:background="@drawable/round_corner_theme"
     android:padding="20dp">
 
@@ -29,8 +28,8 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:backgroundTint="@android:color/transparent"
+            android:tint="@color/material_dynamic_primary20"
             android:src="@drawable/ic_add_contacts" />
-
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/inputText"
