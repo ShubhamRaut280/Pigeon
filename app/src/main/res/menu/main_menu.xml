@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/itmChat"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="Settings"
-        app:showAsAction="never"/>
 
     <item
-        android:id="@+id/itmCall"
+        android:id="@+id/itmProfile"
         android:icon="@drawable/ic_launcher_foreground"
         android:title="Profile"
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/itmStatus"
+        android:id="@+id/itmSignout"
         android:icon="@drawable/ic_launcher_foreground"
-        android:title="About"
+        android:title="Sign Out"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/itmDelete"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="Delete Account"
         app:showAsAction="never"/>
 
 </menu>

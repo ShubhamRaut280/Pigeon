@@ -1,94 +1,148 @@
 package com.pigeonchat;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.pigeonchat.Login.LoginActivity;
 import com.pigeonchat.adapters.MainViewPagerAdapter;
 import com.pigeonchat.databinding.ActivityMainBinding;
-import com.pigeonchat.fragments.Chats;
+import com.pigeonchat.databinding.CustomDeleteUserDialogboxBinding;
 import com.pigeonchat.fragments.CallLogs;
-import com.google.android.material.tabs.TabLayoutMediator;
+import com.pigeonchat.fragments.Chats;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    boolean online;
-    FirebaseAuth auth;
-    FirebaseUser user;
-    DatabaseReference db;
     private ActivityMainBinding bind;
     private MainViewPagerAdapter mainViewPagerAdapter;
+    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         bind = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        online = true;
+        bind.progressBar.setVisibility(View.VISIBLE);
 
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
+        checkAuthenticationState();
 
-        db = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
+        //Toolbar
+        setSupportActionBar(bind.tbMainToolBar);
 
-        db.child("users")
-                                    .child(user.getUid())
-                                    .child("is_online").setValue(true);
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
-
+        //viewPager
         mainViewPagerAdapter = new MainViewPagerAdapter(this);
-
         mainViewPagerAdapter.addFragment(new Chats(), "Chats");
         mainViewPagerAdapter.addFragment(new CallLogs(), "Calls");
-
         bind.vPgr2.setAdapter(mainViewPagerAdapter);
 
-        new TabLayoutMediator(bind.tbLayout, bind.vPgr2, (tab, position) -> {
-            tab.setText(mainViewPagerAdapter.getPageTitle(position));
-        }).attach();
-        
-        //getFCMToken();
+        TabLayoutMediator mediator = new TabLayoutMediator(bind.tbLayout, bind.vPgr2,
+                (tab, position) -> tab.setText(mainViewPagerAdapter.getPageTitle(position)));
+        mediator.attach();
 
-    }
-
-    private void getFCMToken() {
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener( task->{
-            if(task.isSuccessful()){
-                String token = task.getResult();
-                Log.e("My token", token);
+        databaseReference.child("Users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).get().addOnSuccessListener(snapshot -> {
+            if (snapshot.exists()) {
+                bind.progressBar.setVisibility(View.GONE);
+                bind.tbMainToolBar.setTitle(Objects.requireNonNull(snapshot.child("userName").getValue()).toString());
             }
         });
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        online = false;
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
-        db.child("users")
-                .child(user.getUid())
-                .child("is_online").setValue(false);
+    public static final int ITM_PROFILE = R.id.itmProfile;
+    public static final int ITM_SIGNOUT = R.id.itmSignout;
+    public static final int ITM_DELETE = R.id.itmDelete;
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case ITM_PROFILE:
+                startActivity(new Intent(this, Profile.class));
+                return true;
+            case ITM_SIGNOUT:
+                auth.signOut();
+                return true;
+            case ITM_DELETE:
+                deleteAlertBox();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void checkAuthenticationState() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(auth -> {
+            if (auth.getCurrentUser() == null) {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
+        });
+    }
+
+    private void deleteAlertBox() {
+        CustomDeleteUserDialogboxBinding bindAlert = CustomDeleteUserDialogboxBinding.inflate(getLayoutInflater());
+
+        AlertDialog.Builder customDialogBuilder = new AlertDialog.Builder(this);
+        customDialogBuilder.setView(bindAlert.getRoot());
+
+        AlertDialog alertDialog = customDialogBuilder.create();
+        Objects.requireNonNull(alertDialog.getWindow()).setBackgroundDrawableResource(R.drawable.shape_round);
+        alertDialog.show();
+
+        bindAlert.confirm.setOnClickListener(v -> {
+            String email = Objects.requireNonNull(bindAlert.tvUserEmail.getText()).toString();
+
+            databaseReference.child("Users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).child("email").get().addOnSuccessListener(snapshot -> {
+                if (snapshot.exists()) {
+                    if (!Objects.equals(snapshot.getValue(), email)) {
+                        Toast.makeText(MainActivity.this, "Email Id is not yours", Toast.LENGTH_LONG).show();
+                    } else {
+                        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).removeValue().addOnSuccessListener(aVoid -> {
+                            Toast.makeText(MainActivity.this, "User is Deleted", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        }).addOnFailureListener(e -> Log.e("Delete User", Objects.requireNonNull(e.getMessage())));
+                    }
+                }
+            }).addOnFailureListener(e -> Log.e("Delete User", Objects.requireNonNull(e.getMessage())));
+        });
+
+        bindAlert.Cancel.setOnClickListener(v -> alertDialog.dismiss());
     }
 }
