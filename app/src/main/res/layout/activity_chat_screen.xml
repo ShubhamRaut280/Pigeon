@@ -76,9 +76,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="user_name"
-                            android:textColor="@color/black"
+                            android:textColor="@color/white"
                             android:layout_gravity="center"
                             android:textAlignment="center"
+                            android:textStyle="bold"
                             app:layout_constraintEnd_toEndOf="@+id/profile"
                             app:layout_constraintStart_toStartOf="@+id/profile"
                             app:layout_constraintTop_toBottomOf="@+id/profile" />
@@ -126,7 +127,7 @@
                     android:layout_height="50dp"
                     android:backgroundTint="@android:color/transparent"
                     android:src="@drawable/ic_emoji_button"
-                    android:tint="@color/material_dynamic_primary40" />
+                    android:tint="@color/black" />
 
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -153,7 +154,7 @@
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="1dp"
             app:srcCompat="@drawable/ic_send_button"
-            app:tint="@color/material_dynamic_primary40" />
+            app:tint="@color/black" />
 
     </RelativeLayout>
 

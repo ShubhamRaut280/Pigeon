@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         //Toolbar
         setSupportActionBar(bind.tbMainToolBar);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
 
         //viewPager
         mainViewPagerAdapter = new MainViewPagerAdapter(this);
@@ -60,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
                 (tab, position) -> tab.setText(mainViewPagerAdapter.getPageTitle(position)));
         mediator.attach();
 
-        databaseReference.child("Users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).get().addOnSuccessListener(snapshot -> {
+        databaseReference.child("users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).get().addOnSuccessListener(snapshot -> {
             if (snapshot.exists()) {
                 bind.progressBar.setVisibility(View.GONE);
-                bind.tbMainToolBar.setTitle(Objects.requireNonNull(snapshot.child("userName").getValue()).toString());
+
             }
         });
     }
@@ -79,22 +79,37 @@ public class MainActivity extends AppCompatActivity {
     public static final int ITM_SIGNOUT = R.id.itmSignout;
     public static final int ITM_DELETE = R.id.itmDelete;
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case ITM_PROFILE:
-                startActivity(new Intent(this, Profile.class));
-                return true;
-            case ITM_SIGNOUT:
-                auth.signOut();
-                return true;
-            case ITM_DELETE:
-                deleteAlertBox();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+
+        if(id == R.id.itmProfile){
+            startActivity(new Intent(this, Profile.class));
+            return true;
+        }else if(id == R.id.itmSignout){
+            auth.signOut();
+            return true;
+        }else if(id == R.id.itmDelete){
+            deleteAlertBox();
+            return true;
+        }else{
+            return super.onOptionsItemSelected(item);
         }
+
+
+//        switch (id) {
+//            case R.id.itmProfile:
+//                startActivity(new Intent(this, Profile.class));
+//                return true;
+//            case ITM_SIGNOUT:
+//                auth.signOut();
+//                return true;
+//            case ITM_DELETE:
+//                deleteAlertBox();
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
     }
 
     private void checkAuthenticationState() {
@@ -129,13 +144,13 @@ public class MainActivity extends AppCompatActivity {
         bindAlert.confirm.setOnClickListener(v -> {
             String email = Objects.requireNonNull(bindAlert.tvUserEmail.getText()).toString();
 
-            databaseReference.child("Users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).child("email").get().addOnSuccessListener(snapshot -> {
+            databaseReference.child("users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).child("emailId").get().addOnSuccessListener(snapshot -> {
                 if (snapshot.exists()) {
                     if (!Objects.equals(snapshot.getValue(), email)) {
-                        Toast.makeText(MainActivity.this, "Email Id is not yours", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "Incorrect email ID", Toast.LENGTH_LONG).show();
                     } else {
-                        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).removeValue().addOnSuccessListener(aVoid -> {
-                            Toast.makeText(MainActivity.this, "User is Deleted", Toast.LENGTH_LONG).show();
+                        databaseReference.child("users").child(auth.getCurrentUser().getUid()).removeValue().addOnSuccessListener(aVoid -> {
+                            Toast.makeText(MainActivity.this, "User Deleted", Toast.LENGTH_LONG).show();
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         }).addOnFailureListener(e -> Log.e("Delete User", Objects.requireNonNull(e.getMessage())));
                     }

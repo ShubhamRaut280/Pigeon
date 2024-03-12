@@ -85,12 +85,12 @@ public class Profile extends AppCompatActivity {
                     }
                 });
 
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference = FirebaseDatabase.getInstance("https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app").getReference();
 
-        databaseReference.child("Users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).get().addOnSuccessListener(dataSnapshot -> {
-            profileBinding.etUserName.setText(dataSnapshot.child("userName").getValue(String.class));
+        databaseReference.child("users").child(Objects.requireNonNull(auth.getCurrentUser()).getUid()).get().addOnSuccessListener(dataSnapshot -> {
+            profileBinding.etUserName.setText(dataSnapshot.child("name").getValue(String.class));
             profileBinding.etAbout.setText(dataSnapshot.child("about").getValue(String.class));
-            Glide.with(this).load(dataSnapshot.child("profileImgUrl").getValue(String.class))
+            Glide.with(this).load(dataSnapshot.child("image").getValue(String.class))
                     .into(profileBinding.ivProfileImg);
         });
 
@@ -108,11 +108,11 @@ public class Profile extends AppCompatActivity {
                     .getDownloadUrl()
                     .addOnSuccessListener(uri -> {
                         HashMap<String, Object> userData = new HashMap<>();
-                        userData.put("userName", userName);
+                        userData.put("name", userName);
                         userData.put("about", about);
-                        userData.put("profileImgUrl", uri.toString());
+                        userData.put("image", uri.toString());
 
-                        databaseReference.child("Users").child(auth.getCurrentUser().getUid()).updateChildren(userData)
+                        databaseReference.child("users").child(auth.getCurrentUser().getUid()).updateChildren(userData)
                                 .addOnSuccessListener(aVoid -> {
                                     progressBar.setVisibility(View.GONE);
                                     Toast.makeText(this, "Information Updated Successfully", Toast.LENGTH_LONG).show();

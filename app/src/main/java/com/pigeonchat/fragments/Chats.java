@@ -212,7 +212,7 @@ public class Chats extends Fragment implements ChatRecyclerViewAdapter.OnItemCli
 
         Dialog dialogBox = new Dialog(getContext());
         dialogBox.setContentView(R.layout.input_dialog);
-        dialogBox.getWindow().setBackgroundDrawableResource(R.drawable.custom_dialog_background);
+        dialogBox.getWindow().setBackgroundDrawableResource(R.drawable.shape_round);
         dialogBox.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         MaterialButton addUser = dialogBox.findViewById(R.id.addUserButton);
