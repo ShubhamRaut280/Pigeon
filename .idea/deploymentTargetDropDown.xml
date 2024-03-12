@@ -16,13 +16,14 @@
             </Target>
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-03-04T18:50:25.801119300Z" />
+          <multipleDevicesSelectedInDropDown value="true" />
           <runningDeviceTargetsSelectedWithDialog>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\yadav\.android\avd\Small_Phone_API_28.avd" />
+                  <type value="SERIAL_NUMBER" />
+                  <value value="RZ8NB08H3HK" />
                 </Key>
               </deviceKey>
             </Target>

@@ -1,4 +1,4 @@
-package com.pigeonchat;
+package com.pigeonchat.Utility;
 
 import android.app.Application;
 

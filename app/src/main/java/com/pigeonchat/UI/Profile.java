@@ -1,4 +1,4 @@
-package com.pigeonchat;
+package com.pigeonchat.UI;
 
 
 import android.content.Intent;
@@ -18,6 +18,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.pigeonchat.Login.LoginActivity;
+import com.pigeonchat.MainActivity;
+import com.pigeonchat.R;
 import com.pigeonchat.databinding.ProfileBinding;
 
 import java.util.HashMap;
